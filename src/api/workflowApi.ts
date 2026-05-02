@@ -11,6 +11,22 @@ export const workflowApi = {
     await delay(300);
     return mockWorkflows.find(w => w.id === id);
   },
+  createWorkflow: async (data: Partial<Workflow>): Promise<string> => {
+    await delay(300);
+    const newId = `wf${Date.now()}`;
+    mockWorkflows.push({
+       id: newId,
+       name: data.name || '未命名的新工作流',
+       type: data.type || 'Custom Workflow',
+       description: data.description || '自动解析生成的工作流',
+       nodeCount: data.nodeCount || 0,
+       parameterSchema: data.parameterSchema || [],
+       resourceDependencies: data.resourceDependencies || [],
+       outputNodes: data.outputNodes || [],
+       status: 'active'
+    });
+    return newId;
+  },
   uploadWorkflow: async (file: File): Promise<{ success: boolean; data: any }> => {
     await delay(2000);
     return {
@@ -44,6 +60,7 @@ export const workflowApi = {
       if (data && typeof data === 'object') {
          // ComfyUI workflow format usually has either root nodes or a flat Object map (API format)
          const nodes = data.nodes || data; // Handle both UI json and API json roughly
+         let clipTextCount = 0;
          if(Array.isArray(nodes)) {
             // UI Format roughly
             nodeCount = nodes.length;
@@ -59,13 +76,16 @@ export const workflowApi = {
                   const inputs = node.inputs;
                   
                   if (cType === 'CLIPTextEncode') {
-                     parameterSchema.push({ name: `prompt_${key}`, label: '正向提示词', type: 'textarea', required: true });
+                     let label = clipTextCount === 0 ? '正向提示词' : (clipTextCount === 1 ? '反向提示词' : `文本提示 ${clipTextCount + 1}`);
+                     parameterSchema.push({ name: `prompt_${key}`, label, type: 'textarea', required: true });
+                     clipTextCount++;
                   } else if (cType === 'KSampler') {
                      parameterSchema.push({ name: `seed_${key}`, label: '随机种子', type: 'seed', required: false });
                      if(inputs.steps) parameterSchema.push({ name: `steps_${key}`, label: '采样步数', type: 'slider', max: 150, min: 1, step: 1, defaultValue: inputs.steps, required: false });
                      if(inputs.cfg) parameterSchema.push({ name: `cfg_${key}`, label: 'CFG Scale', type: 'slider', max: 30, min: 1, step: 0.5, defaultValue: inputs.cfg, required: false });
                      if(inputs.sampler_name) parameterSchema.push({ name: `sampler_name_${key}`, label: '采样器', type: 'select', options: [{ label: inputs.sampler_name, value: inputs.sampler_name }, { label: 'euler', value: 'euler' }, { label: 'dpmp', value: 'dpmpp_2m' }], defaultValue: inputs.sampler_name, required: false });
                      if(inputs.scheduler) parameterSchema.push({ name: `scheduler_${key}`, label: '调度器', type: 'select', options: [{ label: inputs.scheduler, value: inputs.scheduler }, { label: 'normal', value: 'normal' }, { label: 'karras', value: 'karras' }], defaultValue: inputs.scheduler, required: false });
+                     if(inputs.denoise) parameterSchema.push({ name: `denoise_${key}`, label: '重绘幅度 (Denoise)', type: 'slider', max: 1, min: 0, step: 0.01, defaultValue: inputs.denoise, required: false });
                   } else if (cType === 'CheckpointLoaderSimple') {
                      parameterSchema.push({ name: `ckpt_${key}`, label: '大模型', type: 'checkpoint', required: true });
                      if(typeof inputs.ckpt_name === 'string') detectedDependencies.push(inputs.ckpt_name);
@@ -77,6 +97,9 @@ export const workflowApi = {
                   } else if (cType === 'VAELoader') {
                      parameterSchema.push({ name: `vae_${key}`, label: 'VAE', type: 'vae', required: false });
                      if(typeof inputs.vae_name === 'string') detectedDependencies.push(inputs.vae_name);
+                  } else if (cType === 'ControlNetLoader') {
+                     parameterSchema.push({ name: `controlnet_${key}`, label: 'ControlNet', type: 'controlnet', required: false });
+                     if(typeof inputs.control_net_name === 'string') detectedDependencies.push(inputs.control_net_name);
                   } else if (cType === 'EmptyLatentImage') {
                      if(inputs.width) parameterSchema.push({ name: `width_${key}`, label: '宽度', type: 'number', defaultValue: inputs.width, required: true });
                      if(inputs.height) parameterSchema.push({ name: `height_${key}`, label: '高度', type: 'number', defaultValue: inputs.height, required: true });

@@ -32,6 +32,19 @@ export default function WorkflowUpload() {
     setIsUploading(false);
   };
 
+    const handleSave = async () => {
+      if (!result) return;
+      const newId = await workflowApi.createWorkflow({
+         name: '新上传工作流 ' + new Date().toLocaleTimeString(),
+         type: result.type,
+         nodeCount: result.nodeCount,
+         parameterSchema: result.parameterSchema,
+         resourceDependencies: result.detectedDependencies,
+         outputNodes: result.outputNodes
+      });
+      nav('/admin/workflows/' + newId);
+    };
+
   return (
     <div className="max-w-3xl">
        <h1 className="text-2xl font-bold text-white mb-6">解析与上传工作流</h1>
@@ -99,7 +112,7 @@ export default function WorkflowUpload() {
 
             <div className="mt-8 pt-8 border-t border-white/5 flex gap-4">
               <Button onClick={() => setResult(null)} variant="outline">重新上传</Button>
-              <Button onClick={() => nav('/admin/workflows')} className="flex-1">
+              <Button onClick={handleSave} className="flex-1">
                  保存并进入详情图谱 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             </div>

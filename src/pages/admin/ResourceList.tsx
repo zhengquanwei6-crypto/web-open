@@ -9,10 +9,23 @@ import { Input } from '../../components/ui/Input';
 export default function ResourceList() {
   const [resources, setResources] = useState<ComfyResource[]>([]);
   const [search, setSearch] = useState('');
+  const [syncing, setSyncing] = useState(false);
+
+  const loadResources = () => {
+    comfyApi.getComfyResources().then(setResources);
+  };
 
   useEffect(() => {
-    comfyApi.getComfyResources().then(setResources);
+    loadResources();
   }, []);
+
+  const handleSync = async () => {
+    setSyncing(true);
+    const result = await comfyApi.syncComfyResources();
+    setSyncing(false);
+    alert(`同步成功，当前资源总数: ${result.count}`);
+    loadResources();
+  };
 
   const filtered = resources.filter(r => r.name.toLowerCase().includes(search.toLowerCase()));
 
@@ -21,6 +34,9 @@ export default function ResourceList() {
        <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-white flex items-center gap-2">
             <HardDrive className="w-6 h-6 text-indigo-400" /> 资源库
+             <span className="text-sm font-normal text-slate-500 bg-white/5 px-3 py-1 rounded-full border border-white/5 ml-2">
+                共 {resources.length} 项
+             </span>
           </h1>
           <div className="flex gap-4">
              <Input 
@@ -28,7 +44,10 @@ export default function ResourceList() {
                value={search} onChange={e => setSearch(e.target.value)} 
                className="w-64"
              />
-             <Button variant="outline"><RefreshCcw className="w-4 h-4 mr-2" /> 强制同步</Button>
+             <Button variant="outline" onClick={handleSync} disabled={syncing}>
+               <RefreshCcw className={`w-4 h-4 mr-2 ${syncing ? 'animate-spin' : ''}`} /> 
+               {syncing ? '同步中...' : '强制同步'}
+             </Button>
           </div>
        </div>
 
