@@ -10,6 +10,8 @@ import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
 import { cn } from '../../utils/cn';
 
+import { DynamicWorkflowForm } from '../../components/workflow/DynamicWorkflowForm';
+
 export default function ChatPage() {
   const { id } = useParams();
   const [character, setCharacter] = useState<Character | null>(null);
@@ -29,8 +31,8 @@ export default function ChatPage() {
       characterApi.getCharacterById(id).then(c => {
         if (c) {
           setCharacter(c);
-          if (c.workflowId) {
-            workflowApi.getWorkflowById(c.workflowId).then(w => {
+          if (c.workflowIds && c.workflowIds.length > 0) {
+            workflowApi.getWorkflowById(c.workflowIds[0]).then(w => {
               if (w) setWorkflow(w);
             });
           }
@@ -73,10 +75,10 @@ export default function ChatPage() {
     setMessages([]);
   };
 
-  const handleRunWorkflow = async () => {
+  const handleRunWorkflow = async (values: Record<string, any>) => {
     if(!workflow || !id) return;
     setIsGeneratingImg(true);
-    const result = await workflowApi.runWorkflow(workflow.id, workflowParams);
+    const result = await workflowApi.runWorkflow(workflow.id, values);
     
     const msg: ChatMessage = {
       id: `img-${Date.now()}`,
@@ -217,40 +219,11 @@ export default function ChatPage() {
               </div>
               <div className="bg-white/5 border border-white/10 rounded-xl p-4">
                 <div className="text-xs text-indigo-400 mb-4">{workflow.name}</div>
-                <div className="space-y-4">
-                  {workflow.parameterSchema.map((param) => (
-                    <div key={param.name}>
-                      <label className="text-xs text-slate-400 mb-1 block">{param.label}</label>
-                      {param.type === 'textarea' ? (
-                        <Textarea 
-                          className="min-h-[60px] text-xs py-1.5" 
-                          placeholder={param.defaultValue}
-                          onChange={e => setWorkflowParams({...workflowParams, [param.name]: e.target.value})}
-                        />
-                      ) : param.type === 'number' || param.type === 'slider' ? (
-                        <input 
-                          type="range" min={param.min} max={param.max} step={param.step} 
-                          className="w-full accent-indigo-500" 
-                          onChange={e => setWorkflowParams({...workflowParams, [param.name]: e.target.value})}
-                        />
-                      ) : (
-                        <Input 
-                          className="h-8 text-xs px-2" 
-                          placeholder={`Type: ${param.type}`}
-                          onChange={e => setWorkflowParams({...workflowParams, [param.name]: e.target.value})}
-                        />
-                      )}
-                    </div>
-                  ))}
-                  
-                  <Button 
-                    className="w-full mt-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 transition-opacity text-white border-0 shadow-lg"
-                    onClick={handleRunWorkflow}
-                    disabled={isGeneratingImg}
-                  >
-                    {isGeneratingImg ? '生成中...' : <><ImageIcon className="w-4 h-4 mr-2" /> 运行节点</>}
-                  </Button>
-                </div>
+                <DynamicWorkflowForm 
+                  parameters={workflow.parameterSchema} 
+                  onSubmit={handleRunWorkflow} 
+                  isSubmitting={isGeneratingImg} 
+                />
               </div>
             </div>
           )}

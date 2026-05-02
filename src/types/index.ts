@@ -9,7 +9,7 @@ export interface Character {
   tags: string[];
   capabilities: string[];
   modelId: string;
-  workflowId?: string;
+  workflowIds?: string[];
   hotness: number;
   exampleDialogues: { user: string; ai: string }[];
 }
@@ -78,6 +78,20 @@ export interface DashboardStats {
   lmConnected: boolean;
   comfyConnected: boolean;
   activeWorkflows: number;
+}
+
+export interface ComfyConfig {
+  baseUrl: string;
+  lastChecked?: string;
+  status: 'active' | 'inactive';
+}
+
+export interface ChatLog {
+  id: string;
+  characterId: string;
+  userId: string;
+  content: string;
+  timestamp: string;
 }
 
 export interface User {

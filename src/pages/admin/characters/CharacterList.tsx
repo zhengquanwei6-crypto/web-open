@@ -43,7 +43,9 @@ export default function AdminCharacterList() {
                 <td className="px-6 py-4">
                   <div className="flex flex-col gap-1">
                      <Badge variant="outline" className="w-fit">{char.modelId}</Badge>
-                     {char.workflowId && <Badge variant="secondary" className="w-fit border-purple-500/50 text-purple-400">{char.workflowId}</Badge>}
+                     {(char.workflowIds || []).map(wId => (
+                       <Badge key={wId} variant="secondary" className="w-fit border-purple-500/50 text-purple-400">{wId}</Badge>
+                     ))}
                   </div>
                 </td>
                 <td className="px-6 py-4">{char.hotness}</td>

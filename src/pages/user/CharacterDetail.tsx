@@ -60,7 +60,7 @@ export default function CharacterDetail() {
                 <div className="text-slate-500 text-xs font-semibold mb-2 flex items-center gap-2">
                   <Layers className="w-4 h-4" /> 绑定工作流
                 </div>
-                <div className="text-white font-medium">{character.workflowId || '无关联'}</div>
+                <div className="text-white font-medium">{character.workflowIds?.join(', ') || '无关联'}</div>
               </div>
             </div>
 

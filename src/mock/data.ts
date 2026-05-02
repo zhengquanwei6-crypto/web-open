@@ -76,7 +76,7 @@ export const mockCharacters: Character[] = [
     tags: ['图像生成', '绘画', '设计'],
     capabilities: ['文生图', '图生图', '风格转换'],
     modelId: 'm1',
-    workflowId: 'w2',
+    workflowIds: ['w2'],
     hotness: 9999,
     exampleDialogues: [
       { user: '帮我画一只戴着赛博朋克风眼镜的猫。', ai: '好的，正在为您调用【文生图】工作流。Prompt: Cyberpunk cat wearing neon glasses...（返回了一张精美的图片）' }
@@ -93,7 +93,7 @@ export const mockCharacters: Character[] = [
     tags: ['康复辅助', '健康', '专业'],
     capabilities: ['动作指导', '康复计划', '状态评估'],
     modelId: 'm1',
-    workflowId: 'w3',
+    workflowIds: ['w3'],
     hotness: 4500,
     exampleDialogues: [
       { user: '我最近肩膀一直有点酸痛。', ai: '肩膀酸痛可能是长期伏案导致的圆肩驼背。你可以试试靠墙站立，双臂打开贴墙上滑。如果您拍个侧面照片，我可以帮你分析下体态。' }

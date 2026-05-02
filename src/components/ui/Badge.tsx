@@ -5,6 +5,7 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'secondary' | 'outline' | 'glass';
   className?: string;
   children?: React.ReactNode;
+  key?: React.Key;
 }
 
 function Badge({ className, variant = "default", ...props }: BadgeProps) {
