@@ -234,3 +234,11 @@ export const mockChats: Record<string, ChatMessage[]> = {
     { id: 'msg2', role: 'ai', content: '抱抱你，辛苦了。无论发生了什么，我都在这里陪着你呢。要不要放点轻音乐休息一下？', timestamp: '2026-05-02 10:00:15' }
   ]
 };
+
+export const mockChatLogs = [
+  { id: 'log1', userId: 'u1', characterId: 'c1', content: '今天好累啊', timestamp: '2026-05-02 10:00:00', status: 'success' },
+  { id: 'log2', userId: 'u1', characterId: 'c1', content: '抱抱你，辛苦了。无论发生了什么，我都在这里陪着你呢。要不要放点轻音乐休息一下？', timestamp: '2026-05-02 10:00:15', status: 'success' },
+  { id: 'log3', userId: 'u2', characterId: 'c2', content: '帮我看看这段代码', timestamp: '2026-05-02 10:05:00', status: 'success' },
+  { id: 'log4', userId: 'u2', characterId: 'c5', content: '画一只猫', timestamp: '2026-05-02 10:10:00', status: 'success' },
+  { id: 'log5', userId: 'u3', characterId: 'c4', content: '不知道写什么', timestamp: '2026-05-02 11:00:00', status: 'failed' }
+];

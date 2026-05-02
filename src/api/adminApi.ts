@@ -1,5 +1,5 @@
 import { DashboardStats, User, Character, ChatLog } from '../types';
-import { mockDashboardStats, mockUsers } from '../mock/data';
+import { mockDashboardStats, mockUsers, mockChatLogs } from '../mock/data';
 import { delay } from './utils';
 
 export const adminApi = {
@@ -20,11 +20,11 @@ export const adminApi = {
       greeting: '你好，我是根据你的想法诞生的虚拟生命。'
     };
   },
-  getChatLogs: async (page = 1, limit = 20): Promise<{ logs: ChatLog[], total: number }> => {
+  getChatLogs: async (page = 1, limit = 20): Promise<{ logs: any[], total: number }> => {
     await delay(500);
     return {
-      logs: [],
-      total: 0
+      logs: mockChatLogs.slice((page - 1) * limit, page * limit),
+      total: mockChatLogs.length
     };
   },
   analyzeWorkflowWithAI: async (workflowContent: string): Promise<any> => {

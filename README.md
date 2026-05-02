@@ -1,20 +1,36 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# AI 虚拟角色聊天平台
 
-# Run and deploy your AI Studio app
+这是一个基于 React + Tailwind CSS 构建的 AI 虚拟角色聊天平台前端。
 
-This contains everything you need to run your app locally.
+## 架构说明
 
-View your app in AI Studio: https://ai.studio/apps/4d6f14a9-9e5c-483c-90e2-41cbecef9da8
+本项目采纳了前后端分离架构设计理念：
+**前端 UI** → **后端 API** → **Cloud Studio 端口外链** → **LM 大模型 / ComfyUI**
 
-## Run Locally
+**注意**：
+- 前端 **不** 保存任何模型 API Key 或相关敏感信息。
+- 前端 **不** 直接连接 LM 大模型（如 Gemini、GPT）或 ComfyUI 等本地计算服务。
+- 所有的模型调度、API Key 保护、后端计算任务统统交由后端 API 进行隔离和处理。
+- 本仓库代码目前主要为前端原型和工程化示例，其中涉及到 API 的部分使用了 Mock 数据拦截模拟（详见 `src/api` 和 `src/mock` 目录），并未接入真实后端或模型。
 
-**Prerequisites:**  Node.js
+## 主要功能模块
 
+- **用户端**
+  - 角色列表与详情。
+  - AI 聊天对话：与拥有特定设定的虚拟角色进行对话，结合大语言模型。
+  - 生图交互：针对带有【文生图】等能力设定的虚拟角色，可以实时根据工作流配置进行图像生成。
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+- **管理后台端（Admin）**
+  - 仪表盘统计。
+  - **角色管理**：管理并配置平台内的虚拟角色参数与功能。
+  - **工作流管理**：上传、解析、预览 ComfyUI JSON 格式节点图，支持对 API FORMAT JSON 的节点依赖、参数架构提取（Parameter Schema）。
+  - **模型管理**：管理 LLM 和生图模型的配置。
+  - **ComfyUI 管理**：配置云端或本地 ComfyUI API 服务并测试连接、同步资源。
+  - **聊天记录审计**：查看所有用户与角色的历史聊天记录。
+
+## 部署说明
+
+当前前端可运行于 Node.js (Vite) 或进行静态打包。
+`npm install`
+`npm run dev`
+`npm run build`

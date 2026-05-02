@@ -1,19 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { comfyApi } from '../../api';
+import { ComfyConfig as ComfyConfigType } from '../../types';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card, CardContent } from '../../components/ui/Card';
-import { Box, Server, RefreshCcw, CheckCircle2 } from 'lucide-react';
+import { Box, Server, RefreshCcw, CheckCircle2, Save, XCircle } from 'lucide-react';
 
 export default function ComfyConfig() {
   const [testing, setTesting] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [config, setConfig] = useState<ComfyConfigType | null>(null);
+  const [baseUrlInput, setBaseUrlInput] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    comfyApi.getComfyConfig().then(cfg => {
+      setConfig(cfg);
+      setBaseUrlInput(cfg.baseUrl);
+    });
+  }, []);
 
   const handleTest = async () => {
     setTesting(true);
-    await comfyApi.testComfyConnection();
+    const success = await comfyApi.testComfyConnection();
     setTesting(false);
-    alert('ComfyUI 连接正常 (Mock)');
+    if(success) {
+       alert('ComfyUI 连接正常');
+    } else {
+       alert('ComfyUI 连接失败');
+    }
+    // reload config to get latest status
+    comfyApi.getComfyConfig().then(cfg => setConfig(cfg));
   };
 
   const handleSync = async () => {
@@ -21,6 +38,13 @@ export default function ComfyConfig() {
     const res = await comfyApi.syncComfyResources();
     setSyncing(false);
     alert(`同步成功，发现 ${res.count} 个资源`);
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    await comfyApi.updateComfyConfig({ baseUrl: baseUrlInput });
+    setSaving(false);
+    alert('配置已保存 (Mock)');
   };
 
   return (
@@ -40,7 +64,12 @@ export default function ComfyConfig() {
             <div className="flex-1 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-400 mb-2">ComfyUI API Base URL (外链地址)</label>
-                <Input defaultValue="https://xxxxx-8188.asia-east1.run.app" />
+                <div className="flex gap-2">
+                   <Input value={baseUrlInput} onChange={(e) => setBaseUrlInput(e.target.value)} />
+                   <Button onClick={handleSave} disabled={saving} variant="outline" className="shrink-0 border-white/10 hover:bg-white/5">
+                      {saving ? '保存中...' : <><Save className="w-4 h-4 mr-2" /> 保存设置</>}
+                   </Button>
+                </div>
                 <p className="text-xs text-slate-500 mt-2">确保该地址允许来自后端的 API 请求。</p>
               </div>
               
@@ -48,7 +77,7 @@ export default function ComfyConfig() {
                 <Button onClick={handleTest} disabled={testing} variant="default" className="bg-purple-600 hover:bg-purple-500 shadow-[0_0_15px_rgba(147,51,234,0.4)]">
                    {testing ? '连接中...' : <><Server className="w-4 h-4 mr-2" /> 测试连接</>}
                 </Button>
-                <Button onClick={handleSync} disabled={syncing} variant="outline" className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10">
+                <Button onClick={handleSync} disabled={syncing || config?.status !== 'active'} variant="outline" className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10">
                    {syncing ? '同步中...' : <><RefreshCcw className="w-4 h-4 mr-2" /> 同步资源库</>}
                 </Button>
               </div>
@@ -58,16 +87,24 @@ export default function ComfyConfig() {
       </Card>
       
       <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/5">
-         <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2"><CheckCircle2 className="text-green-500 w-5 h-5"/> 当前状态</h3>
+         <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+            {config?.status === 'active' ? <CheckCircle2 className="text-green-500 w-5 h-5"/> : <XCircle className="text-red-500 w-5 h-5"/>} 
+            当前状态
+         </h3>
          <div className="space-y-4 text-sm text-slate-400">
             <div className="flex justify-between border-b border-white/5 pb-2">
-              <span>连接状态</span><span className="text-green-400 font-medium">正常在线</span>
+              <span>连接状态</span>
+              {config?.status === 'active' ? (
+                <span className="text-green-400 font-medium">正常在线</span>
+              ) : (
+                <span className="text-red-400 font-medium">离线或未接入</span>
+              )}
             </div>
             <div className="flex justify-between border-b border-white/5 pb-2">
-              <span>最后检测时间</span><span className="text-slate-300">2026-05-02 00:45:12</span>
+              <span>最后检测时间</span><span className="text-slate-300">{config?.lastChecked || '从未检测'}</span>
             </div>
             <div className="flex justify-between pb-2">
-              <span>本地已记录资源数</span><span className="text-slate-300">16 个模型文件</span>
+              <span>本地已记录资源数</span><span className="text-slate-300">16 个模型文件 (Mock)</span>
             </div>
          </div>
       </div>
