@@ -104,7 +104,7 @@ export default function ComfyConfig() {
               <span>最后检测时间</span><span className="text-slate-300">{config?.lastChecked || '从未检测'}</span>
             </div>
             <div className="flex justify-between pb-2">
-              <span>本地已记录资源数</span><span className="text-slate-300">16 个模型文件 (Mock)</span>
+              <span>本地已记录资源数</span><span className="text-slate-300">{typeof config?.resourceCount === 'number' ? `${config.resourceCount} 个模型文件` : '未知'}</span>
             </div>
          </div>
       </div>

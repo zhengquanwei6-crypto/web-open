@@ -64,18 +64,23 @@ export const workflowApi = {
                      parameterSchema.push({ name: `seed_${key}`, label: '随机种子', type: 'seed', required: false });
                      if(inputs.steps) parameterSchema.push({ name: `steps_${key}`, label: '采样步数', type: 'slider', max: 150, min: 1, step: 1, defaultValue: inputs.steps, required: false });
                      if(inputs.cfg) parameterSchema.push({ name: `cfg_${key}`, label: 'CFG Scale', type: 'slider', max: 30, min: 1, step: 0.5, defaultValue: inputs.cfg, required: false });
+                     if(inputs.sampler_name) parameterSchema.push({ name: `sampler_name_${key}`, label: '采样器', type: 'select', options: [{ label: inputs.sampler_name, value: inputs.sampler_name }, { label: 'euler', value: 'euler' }, { label: 'dpmp', value: 'dpmpp_2m' }], defaultValue: inputs.sampler_name, required: false });
+                     if(inputs.scheduler) parameterSchema.push({ name: `scheduler_${key}`, label: '调度器', type: 'select', options: [{ label: inputs.scheduler, value: inputs.scheduler }, { label: 'normal', value: 'normal' }, { label: 'karras', value: 'karras' }], defaultValue: inputs.scheduler, required: false });
                   } else if (cType === 'CheckpointLoaderSimple') {
                      parameterSchema.push({ name: `ckpt_${key}`, label: '大模型', type: 'checkpoint', required: true });
                      if(typeof inputs.ckpt_name === 'string') detectedDependencies.push(inputs.ckpt_name);
                   } else if (cType === 'LoraLoader') {
                      parameterSchema.push({ name: `lora_${key}`, label: 'Lora 模型', type: 'lora', required: false });
                      if(typeof inputs.lora_name === 'string') detectedDependencies.push(inputs.lora_name);
+                     if(inputs.strength_model) parameterSchema.push({ name: `strength_model_${key}`, label: 'Lora 权重', type: 'slider', max: 2, min: -1, step: 0.05, defaultValue: inputs.strength_model, required: false });
+                     if(inputs.strength_clip) parameterSchema.push({ name: `strength_clip_${key}`, label: 'CLIP 权重', type: 'slider', max: 2, min: -1, step: 0.05, defaultValue: inputs.strength_clip, required: false });
                   } else if (cType === 'VAELoader') {
                      parameterSchema.push({ name: `vae_${key}`, label: 'VAE', type: 'vae', required: false });
                      if(typeof inputs.vae_name === 'string') detectedDependencies.push(inputs.vae_name);
                   } else if (cType === 'EmptyLatentImage') {
                      if(inputs.width) parameterSchema.push({ name: `width_${key}`, label: '宽度', type: 'number', defaultValue: inputs.width, required: true });
                      if(inputs.height) parameterSchema.push({ name: `height_${key}`, label: '高度', type: 'number', defaultValue: inputs.height, required: true });
+                     if(inputs.batch_size) parameterSchema.push({ name: `batch_size_${key}`, label: '批次数量', type: 'number', defaultValue: inputs.batch_size, required: false });
                   } else if (cType === 'LoadImage') {
                      parameterSchema.push({ name: `image_${key}`, label: '上传图片', type: 'image', required: true });
                   } else if (cType === 'SaveImage' || cType === 'PreviewImage') {

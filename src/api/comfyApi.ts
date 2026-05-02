@@ -5,7 +5,8 @@ import { delay } from './utils';
 let mockComfyConfig: ComfyConfig = {
   baseUrl: 'http://127.0.0.1:8188',
   status: 'active',
-  lastChecked: '2026-05-02 00:00:00'
+  lastChecked: '2026-05-02 00:00:00',
+  resourceCount: mockResources.length
 };
 
 export const comfyApi = {

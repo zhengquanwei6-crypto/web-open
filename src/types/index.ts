@@ -84,6 +84,7 @@ export interface ComfyConfig {
   baseUrl: string;
   lastChecked?: string;
   status: 'active' | 'inactive';
+  resourceCount?: number;
 }
 
 export interface ChatLog {
