@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { workflowApi } from '../../../api';
 import { Workflow } from '../../../types';
-import { ArrowLeft, Box, Sparkles, Database } from 'lucide-react';
+import { ArrowLeft, Box, Sparkles, Database, Eye } from 'lucide-react';
 import { Badge } from '../../../components/ui/Badge';
 import { Card, CardHeader, CardTitle, CardContent } from '../../../components/ui/Card';
+import { DynamicWorkflowForm } from '../../../components/workflow/DynamicWorkflowForm';
 
 export default function WorkflowDetail() {
   const { id } = useParams();
@@ -88,7 +89,7 @@ export default function WorkflowDetail() {
             </Card>
          </div>
 
-         {/* Right col - Parameter visualizer */}
+         {/* Right col - Parameter visualizer and preview */}
          <div className="space-y-6">
             <Card className="bg-black/20 border-indigo-500/20 shadow-[0_0_30px_rgba(37,99,235,0.1)]">
               <CardHeader>
@@ -107,6 +108,22 @@ export default function WorkflowDetail() {
                       <div className="text-xs text-slate-500 font-mono">key: {param.name}</div>
                    </div>
                  ))}
+              </CardContent>
+            </Card>
+
+            <Card className="bg-black/20 border-slate-500/20">
+              <CardHeader>
+                 <CardTitle className="text-lg flex items-center gap-2 text-slate-300">
+                    <Eye className="w-5 h-5" /> 动态表单预览
+                 </CardTitle>
+              </CardHeader>
+              <CardContent>
+                 <div className="bg-[#05060f]/50 p-4 rounded-xl border border-white/5">
+                   <DynamicWorkflowForm 
+                     parameters={workflow.parameterSchema} 
+                     onSubmit={(values) => alert('模拟提交：' + JSON.stringify(values))}
+                   />
+                 </div>
               </CardContent>
             </Card>
          </div>

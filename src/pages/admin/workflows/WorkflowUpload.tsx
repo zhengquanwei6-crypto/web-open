@@ -21,8 +21,14 @@ export default function WorkflowUpload() {
 
   const processFile = async (file: File) => {
     setIsUploading(true);
-    const res = await workflowApi.uploadWorkflow(file);
-    setResult(res.data);
+    try {
+      const content = await file.text();
+      // Also upload file ideally, or just analyze
+      const res = await workflowApi.analyzeWorkflow(content);
+      setResult(res.data);
+    } catch(err) {
+      alert('解析失败，请检查文件格式');
+    }
     setIsUploading(false);
   };
 
@@ -54,7 +60,7 @@ export default function WorkflowUpload() {
               </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-8 text-sm text-slate-300">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-8 text-sm text-slate-300">
                <div>
                  <div className="text-slate-500 mb-1">工作流类型</div>
                  <div className="font-semibold text-white text-base">{result.type}</div>
@@ -63,11 +69,29 @@ export default function WorkflowUpload() {
                  <div className="text-slate-500 mb-1">包含节点数</div>
                  <div className="font-semibold text-white text-base">{result.nodeCount}</div>
                </div>
-               <div className="col-span-2">
+               <div>
+                 <div className="text-slate-500 mb-1">输入参数</div>
+                 <div className="font-semibold text-white text-base">{result.inputParamsCount} 个</div>
+               </div>
+               <div className="col-span-full">
+                 <div className="text-slate-500 mb-2">解析出的 Parameter Schema</div>
+                 <div className="bg-black/30 rounded-xl p-4 font-mono text-xs text-indigo-300 overflow-x-auto">
+                    {JSON.stringify(result.parameterSchema, null, 2)}
+                 </div>
+               </div>
+               <div className="col-span-1 lg:col-span-2">
                  <div className="text-slate-500 mb-2">检测到的资源依赖</div>
                  <div className="flex flex-wrap gap-2">
                     {result.detectedDependencies.map((dep: string) => (
                       <span key={dep} className="px-3 py-1 bg-white/10 rounded-lg">{dep}</span>
+                    ))}
+                 </div>
+               </div>
+               <div className="col-span-1">
+                 <div className="text-slate-500 mb-2">输出节点</div>
+                 <div className="flex flex-wrap gap-2">
+                    {result.outputNodes.map((node: string) => (
+                      <span key={node} className="px-3 py-1 border border-indigo-500/30 text-indigo-400 rounded-lg">{node}</span>
                     ))}
                  </div>
                </div>

@@ -34,12 +34,28 @@ export const workflowApi = {
   },
   analyzeWorkflow: async (fileContent: string): Promise<any> => {
     await delay(1000);
+    // 模拟解析过程，尝试解析JSON以获取真实的nodeCount等（可根据内容进行分析）
+    let nodeCount = 30;
+    try {
+      const data = JSON.parse(fileContent);
+      if (data && typeof data === 'object') {
+         nodeCount = Object.keys(data).length || 30;
+      }
+    } catch(e) {}
+    
     return {
       success: true,
       data: {
-        type: 'Image Generation',
-        nodeCount: 30,
-        detectedDependencies: ['GhostMix', 'Cyberpunk Lora']
+        type: '图片生成 (Image Generation)',
+        nodeCount: nodeCount,
+        inputParamsCount: 4,
+        parameterSchema: [
+          { name: 'prompt', type: 'textarea', label: '正向提示词' },
+          { name: 'seed', type: 'seed', label: '随机种子' },
+          { name: 'checkpoint', type: 'checkpoint', label: '大模型' }
+        ],
+        detectedDependencies: ['GhostMix', 'Cyberpunk Lora'],
+        outputNodes: ['SaveImage_1', 'PreviewImage_3']
       }
     };
   },
